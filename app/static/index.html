@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BlackSpider</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+    <link rel="stylesheet" href="/static/assets/css/xterm.css" />
+    <link rel="stylesheet" href="/static/assets/css/styles.css?v=terminal-sessions-2" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="file-pane">
+        <header class="pane-header">
+          <div>
+            <strong>Files</strong>
+            <span id="rootLabel"></span>
+          </div>
+          <button id="refreshFiles" class="icon-button labeled-button" title="Refresh files" aria-label="Refresh files">
+            <span class="app-icon" aria-hidden="true">↻</span>
+            
+          </button>
+        </header>
+        <nav id="breadcrumbs" class="breadcrumbs"></nav>
+        <div id="fileList" class="file-list"></div>
+      </aside>
+
+      <section class="terminal-pane">
+        <header class="topbar">
+          <div id="tabs" class="tabs"></div>
+          <div class="actions">
+            <button id="newTerminal" class="icon-button labeled-button" title="New terminal" aria-label="New terminal">
+              <span class="app-icon" aria-hidden="true">+</span>
+              <span>New</span>
+            </button>
+            <button id="themeToggle" class="icon-button labeled-button" title="Toggle theme" aria-label="Toggle theme">
+              <span class="app-icon" aria-hidden="true">◐</span>
+              <span>Theme</span>
+            </button>
+            <button id="settingsToggle" class="icon-button labeled-button" title="Settings" aria-label="Settings">
+              <span class="app-icon" aria-hidden="true">⚙</span>
+            </button>
+          </div>
+        </header>
+        <div id="terminalHost" class="terminal-host">
+          <div id="emptyTerminalState" class="empty-terminal-state">
+            <button id="emptyNewTerminal" class="empty-terminal-button" type="button" aria-label="Create terminal">
+              <span class="empty-plus" aria-hidden="true">+</span>
+              <span>Create a terminal</span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div id="settingsOverlay" class="settings-overlay"></div>
+    <aside id="settingsPanel" class="settings-panel">
+      <header class="settings-header">
+        <strong>Settings</strong>
+        <button id="settingsClose" class="icon-button" title="Close settings" aria-label="Close settings">
+          <span class="app-icon" aria-hidden="true">&times;</span>
+        </button>
+      </header>
+      <div class="settings-body">
+
+        <section class="setting-group">
+          <label class="setting-label">Accent color</label>
+          <div id="accentSwatches" class="swatch-row">
+            <button class="swatch" data-color="#5cc8a7" data-color-light="#007a67" style="background:#5cc8a7" title="Teal"></button>
+            <button class="swatch" data-color="#6ea8fe" data-color-light="#3b82f6" style="background:#6ea8fe" title="Blue"></button>
+            <button class="swatch" data-color="#c084fc" data-color-light="#8b5cf6" style="background:#c084fc" title="Purple"></button>
+            <button class="swatch" data-color="#fb7185" data-color-light="#e11d48" style="background:#fb7185" title="Rose"></button>
+            <button class="swatch" data-color="#fbbf24" data-color-light="#d97706" style="background:#fbbf24" title="Amber"></button>
+            <button class="swatch" data-color="#34d399" data-color-light="#059669" style="background:#34d399" title="Green"></button>
+            <button class="swatch" data-color="#f97316" data-color-light="#ea580c" style="background:#f97316" title="Orange"></button>
+            <button class="swatch" data-color="#38bdf8" data-color-light="#0284c7" style="background:#38bdf8" title="Sky"></button>
+          </div>
+        </section>
+
+        <section class="setting-group">
+          <label class="setting-label" for="fontSizeRange">Terminal font size <span id="fontSizeValue" class="setting-value">13px</span></label>
+          <input id="fontSizeRange" type="range" min="10" max="22" step="1" value="13" class="setting-range" />
+        </section>
+
+        <section class="setting-group">
+          <label class="setting-label" for="fontFamilySelect">Terminal font</label>
+          <select id="fontFamilySelect" class="setting-select">
+            <option value='Menlo, Monaco, Consolas, "Liberation Mono", monospace'>Menlo / Monaco</option>
+            <option value='"Fira Code", Menlo, monospace'>Fira Code</option>
+            <option value='"JetBrains Mono", Menlo, monospace'>JetBrains Mono</option>
+            <option value='"Source Code Pro", Menlo, monospace'>Source Code Pro</option>
+            <option value='"Cascadia Code", Menlo, monospace'>Cascadia Code</option>
+            <option value='"Courier New", Courier, monospace'>Courier New</option>
+          </select>
+        </section>
+
+        <section class="setting-group">
+          <label class="setting-label" for="cursorStyleSelect">Cursor style</label>
+          <select id="cursorStyleSelect" class="setting-select">
+            <option value="block">Block</option>
+            <option value="underline">Underline</option>
+            <option value="bar">Bar</option>
+          </select>
+        </section>
+
+        <section class="setting-group">
+          <label class="setting-label setting-toggle-label">
+            <span>Cursor blink</span>
+            <input id="cursorBlinkToggle" type="checkbox" checked class="setting-checkbox" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </section>
+
+        <section class="setting-group">
+          <label class="setting-label setting-toggle-label">
+            <span>Show file pane</span>
+            <input id="filePaneToggle" type="checkbox" checked class="setting-checkbox" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          </label>
+        </section>
+
+      </div>
+    </aside>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/xterm@5.5.0/lib/xterm.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script> -->
+    <script src="/static/assets/js/xterm.min.js"></script>
+    <script src="/static/assets/js/addon-fit.min.js"></script>
+    <script src="/static/assets/js/app.js?v=terminal-sessions-2"></script>
+  </body>
+</html>
