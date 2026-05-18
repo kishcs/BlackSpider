@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from fastapi import FastAPI, HTTPException, Query, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -54,18 +55,34 @@ TEXT_EXTENSIONS = {
 PDF_EXTENSION = ".pdf"
 terminal_manager = TerminalManager()
 
-app = FastAPI(title="BlackSpider Terminal")
+from contextlib import asynccontextmanager
+
+
+@asynccontextmanager
+async def lifespan(application: FastAPI):
+    cleanup_task = asyncio.create_task(_cleanup_loop())
+    yield
+    cleanup_task.cancel()
+
+
+async def _cleanup_loop() -> None:
+    while True:
+        terminal_manager.cleanup_idle()
+        await asyncio.sleep(60)
+
+
+app = FastAPI(title="BlackSpider Terminal", lifespan=lifespan)
+
+CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=CORS_ORIGINS.split(","),
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
-
-@app.on_event("startup")
-async def start_terminal_cleanup() -> None:
-    async def cleanup_loop() -> None:
-        while True:
-            terminal_manager.cleanup_idle()
-            await asyncio.sleep(60)
-
-    asyncio.create_task(cleanup_loop())
 
 
 def resolve_workspace_path(raw_path: str | None = None) -> Path:
@@ -341,3 +358,22 @@ async def terminal_socket(websocket: WebSocket) -> None:
     finally:
         session.unsubscribe(subscriber)
         output_task.cancel()
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    host = os.environ.get("HOST", "0.0.0.0")
+    port = int(os.environ.get("PORT", "8000"))
+    workers = int(os.environ.get("WORKERS", "1"))
+    log_level = os.environ.get("LOG_LEVEL", "info")
+    reload = os.environ.get("RELOAD", "false").lower() == "true"
+
+    uvicorn.run(
+        "app.main:app",
+        host=host,
+        port=port,
+        workers=workers,
+        log_level=log_level,
+        reload=reload,
+    )

@@ -7,9 +7,19 @@ A FastAPI web application with multiple PTY-backed terminal tabs, a workspace fi
 ```bash
 ./setup.sh    # one-time: creates venv and installs dependencies
 ./start.sh    # starts the server
+./stop.sh     # graceful stop
+```
+
+Or run directly with Python (after running `setup.sh`):
+
+```bash
+source .venv/bin/activate
+python -m app.main
 ```
 
 Open `http://127.0.0.1:8000`.
+
+`start.sh` writes the server PID to `.blackspider.pid` and prevents duplicate instances. `stop.sh` reads the PID file, sends a graceful SIGTERM, and falls back to SIGKILL after 10 seconds if needed.
 
 ## Features
 
@@ -59,6 +69,7 @@ Click the gear icon in the topbar to open the settings panel. All changes apply 
 | `TERMINAL_SHELL` | `/bin/bash` | Shell launched in each terminal tab |
 | `TERMINAL_PS1` | `\u@\h:\W \$ ` | Default shell prompt for terminal sessions |
 | `TERMINAL_IDLE_TTL_SECONDS` | `1800` | Seconds before idle (detached) sessions are cleaned up |
+| `CORS_ORIGINS` | `*` | Comma-separated list of allowed CORS origins |
 | `HOST` | `0.0.0.0` | Server bind address |
 | `PORT` | `8000` | Server port |
 | `WORKERS` | `1` | Number of uvicorn workers |
@@ -68,7 +79,7 @@ Click the gear icon in the topbar to open the settings panel. All changes apply 
 Example with overrides:
 
 ```bash
-TERMINAL_ROOT=/home/user/projects PORT=9000 RELOAD=true ./start.sh
+TERMINAL_ROOT=/home/user/projects PORT=9000 CORS_ORIGINS="http://localhost:3000,https://myapp.example.com" ./start.sh
 ```
 
 ## Project Structure
@@ -76,7 +87,8 @@ TERMINAL_ROOT=/home/user/projects PORT=9000 RELOAD=true ./start.sh
 ```
 BlackSpider/
 ├── setup.sh                 # One-time environment setup
-├── start.sh                 # App server launcher
+├── start.sh                 # App server launcher (writes .blackspider.pid)
+├── stop.sh                  # Graceful server shutdown
 ├── requirements.txt         # Python dependencies (FastAPI, uvicorn)
 ├── README.md
 └── app/
