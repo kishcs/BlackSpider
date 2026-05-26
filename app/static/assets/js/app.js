@@ -1,14 +1,16 @@
+const TERMINAL_STORAGE_KEY = "blackspider.terminals";
+const SETTINGS_STORAGE_KEY = "blackspider.settings";
+const FILE_PATH_STORAGE_KEY = "blackspider.filePath";
+
 const state = {
   terminals: new Map(),
   fileTabs: new Map(),
   activeId: null,
   nextId: 1,
   nextFileId: 1,
-  filePath: ".",
+  filePath: localStorage.getItem(FILE_PATH_STORAGE_KEY) || ".",
   theme: localStorage.getItem("theme") || "dark",
 };
-const TERMINAL_STORAGE_KEY = "blackspider.terminals";
-const SETTINGS_STORAGE_KEY = "blackspider.settings";
 
 const DEFAULT_SETTINGS = {
   accentDark: "#5cc8a7",
@@ -454,7 +456,11 @@ function formatSize(bytes) {
 async function loadFiles(path = state.filePath) {
   const response = await fetch(`/api/files?path=${encodeURIComponent(path)}`);
   const data = await response.json();
+  if (data.error && path !== ".") {
+    return loadFiles(".");
+  }
   state.filePath = data.path || ".";
+  localStorage.setItem(FILE_PATH_STORAGE_KEY, state.filePath);
   rootLabelEl.textContent = data.root || "";
   renderBreadcrumbs(state.filePath);
   renderFiles(data);

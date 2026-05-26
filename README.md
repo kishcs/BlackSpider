@@ -35,9 +35,16 @@ Open `http://127.0.0.1:8000`.
 
 - Sidebar file browser rooted at `TERMINAL_ROOT`
 - Breadcrumb navigation with an editable path input — click the pencil icon to type or paste a path directly
-- In-browser file viewer for text files, CSVs (rendered as tables), and PDFs
+- Current folder persists across page reloads (stored in `localStorage`); falls back to root if the saved path no longer exists
+- In-browser editor for text files (source, config, logs, markdown, CSV, and more) with Save, `Cmd/Ctrl+S`, and an unsaved-changes indicator
+- **Preview mode** toggled from the editor toolbar:
+  - `.html` / `.htm` — rendered in a sandboxed iframe (scripts disabled)
+  - `.md` — rendered with [marked](https://marked.js.org/) (GFM enabled, served locally)
+  - `.csv` — rendered as a table by an RFC-4180-style client-side parser (handles quoted fields, embedded commas, escaped quotes, multiline cells)
+- **Image viewer** for `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`, `.bmp`, `.ico`, `.svg` — checkerboard backdrop, natural dimensions shown in the header
+- PDF viewer via the browser's built-in PDF rendering
 - File downloads
-- Path sandboxing prevents navigation outside the workspace root
+- Path sandboxing prevents navigation outside the workspace root, and the save endpoint refuses to overwrite image or PDF paths
 
 ### Settings Panel
 
@@ -106,7 +113,8 @@ BlackSpider/
             └── js/
                 ├── app.js           # App logic, tabs, settings, file nav
                 ├── xterm.min.js     # xterm.js (local)
-                └── addon-fit.min.js # xterm fit addon (local)
+                ├── addon-fit.min.js # xterm fit addon (local)
+                └── marked.min.js    # Markdown renderer for the preview mode (local)
 ```
 
 ## Notes
