@@ -38,6 +38,7 @@ Open `http://127.0.0.1:8000`.
 - In-browser file viewer for text files, CSVs (rendered as tables), and PDFs
 - File downloads
 - Path sandboxing prevents navigation outside the workspace root
+- Now you can edit text files and save the changes.
 
 ### Settings Panel
 
